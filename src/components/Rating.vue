@@ -11,28 +11,15 @@
   </div>
 </template>
 
-<script>
-import { computed } from "@vue/composition-api";
-// import { computed } from "@vue/composition-api";
-export default {
+<script lang="ts">
+import { computed, defineComponent } from "@vue/composition-api";
+import { Rating } from "../types";
+export default defineComponent({
   props: {
-    rating: {
-      type: Number,
-      default: 0
-    }
+    rating: Number // can not type this more
   },
-  // computed: {
-  //   colors() {
-  //     const colors = ["grey", "grey", "grey", "grey", "grey"];
-  //     return colors.map((c, i) => {
-  //       return i < this.rating ? "yellow" : "grey";
-  //     });
-  //   }
-  // }
-  setup(props, context) {
-    // ['Yellow', 'yellow', 'grey', 'grey', 'grey']
+  setup(props: { rating: Rating }) {
     const colors = computed(() => {
-      console.log("attrs : ", context.attrs);
       const colors = [];
       let i = 0;
       while (i++ < 5) {
@@ -44,7 +31,7 @@ export default {
     });
     return { colors };
   }
-};
+});
 </script>
 
 <style></style>

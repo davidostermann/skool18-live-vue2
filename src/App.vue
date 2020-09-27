@@ -1,74 +1,69 @@
 <template>
   <div id="app">
     <img alt="Vue logo" src="./assets/logo.png" />
-    <p>{{ 2 + 1 }}</p>
     <hr />
-    <UserForm />
+    <GenericButton @click="addCarPrefix" label="Ajouter un prefix voiture 🚘" />
     <hr />
-    <ADNButton @send="addCar" label="Ajouter une voiture" />
-    <hr />
-    <Rating :rating="2 + 2" alt="coolItem" />
+    <Rating :rating="1" alt="coolItem" />
     <hr />
     <section>
       <h2>User cards</h2>
       <UserCard v-for="(user, i) in state.users" :key="i" :user="user" />
     </section>
     <hr />
-    <section>
-      <h2>ID cards</h2>
-      <IDCard
-        v-for="user in users"
-        :key="user.codeName"
-        :fullName="user.fullName"
-        :codeName="user.codeName"
-      />
-    </section>
+    <UserForm @createUser="createUser" />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import IDCard from "./components/IDCard.vue";
-import ADNButton from "./components/ADNButton.vue";
+import { uuid } from "uuidv4";
+import {
+  defineComponent,
+  reactive /*ref, toRefs*/,
+  Ref,
+  ref
+} from "@vue/composition-api";
+import GenericButton from "./components/GenericButton.vue";
 import Rating from "./components/Rating.vue";
 import UserCard from "./components/UserCard.vue";
 import UserForm from "./components/UserForm.vue";
-import { data } from "./assets/data.js";
-import { reactive, ref, toRefs } from "@vue/composition-api";
+import { usersMap } from "./assets/data";
+import { NewUser, User } from "./types";
 
-export default Vue.extend({
+export default defineComponent({
   name: "App",
   components: {
-    IDCard,
     UserCard,
     Rating,
     UserForm,
-    ADNButton
+    GenericButton
   },
   setup() {
-    const users = ref(data.users); // ref = donnée reactive
-    const state = reactive({
-      users: data.users
+    // const users = ref(data.users); // ref = donnée reactive
+    const state = reactive<{ users: User[] }>({
+      users: Object.values(usersMap).map(user => reactive(user))
     });
-    function addCar() {
-      // change la reactive
-      state.users = data.users.map(user => {
-        user.fullName = user.fullName + " 🚔";
-        return user;
+
+    const createUser = (newUser: Ref<NewUser>) => {
+      const user: User = reactive({
+        id: uuid(),
+        ...newUser.value
       });
-      // change la ref
-      users.value = data.users.map(user => {
-        user.fullName = user.fullName + " 🚔";
+      state.users.push(user);
+    };
+
+    function addCarPrefix() {
+      // change la reactive
+      state.users = state.users.map(user => {
+        user.fullName = "🚘 " + user.fullName;
         return user;
       });
     }
     return {
-      data,
-      state, // soit on expose le state reatif (reactive)
-      ...toRefs(state), // soit on expose les refs issues du state (reactive)
-      // users, // soit un expose une ref directement
-      initialRating: 4,
-      addCar
+      state,
+      createUser,
+      addCarPrefix
     };
   }
 });

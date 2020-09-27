@@ -1,24 +1,30 @@
 <template>
-  <button type="button" @click="send">{{ label }}</button>
+  <button :type="type" @click="send">{{ label }}</button>
 </template>
 
 <script>
-export default {
+import { defineComponent } from "@vue/composition-api";
+
+export default defineComponent({
   props: {
     label: {
       type: String,
-      default: "send"
+      default: "click"
+    },
+    type: {
+      type: String,
+      default: "button"
     }
   },
   setup(props, context) {
     const send = () => {
-      context.emit("send");
+      context.emit("click");
     };
     return {
       send
     };
   }
-};
+});
 </script>
 
 <style scoped>
